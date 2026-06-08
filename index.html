@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EasyRead — Science Papers in Plain English</title>
+<meta name="description" content="Paste any medical or political science paper. Get a clear, jargon-free explanation anyone can understand — in under 60 seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a18;
+    --ink-2: #4a4a45;
+    --ink-3: #8a8a82;
+    --paper: #f5f2eb;
+    --paper-2: #edeae0;
+    --paper-3: #e2ddd1;
+    --teal: #1a6b5a;
+    --teal-light: #e8f4f0;
+    --teal-mid: #2d8a72;
+    --red: #c0392b;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --max: 1100px;
+    --gap: clamp(1rem, 4vw, 2rem);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--paper);
+    border-bottom: 1px solid var(--paper-3);
+    padding: 0 var(--gap);
+  }
+  .nav-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    color: var(--ink);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); display: inline-block; }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a { color: var(--ink-2); text-decoration: none; font-size: 0.875rem; font-weight: 400; transition: color .2s; }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-cta {
+    background: var(--ink);
+    color: var(--paper) !important;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-weight: 500 !important;
+    transition: background .2s !important;
+  }
+  .nav-cta:hover { background: var(--teal) !important; color: var(--paper) !important; }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 6rem) var(--gap) clamp(2rem, 5vw, 4rem);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; gap: 2rem; }
+    .hero-visual { order: -1; }
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--teal);
+    background: var(--teal-light);
+    padding: 4px 10px; border-radius: 2px;
+    margin-bottom: 1.25rem;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    font-weight: 400;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--teal);
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--ink-2);
+    max-width: 440px;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--teal);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background .2s, transform .15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--teal-mid); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    padding: 12px 24px;
+    border-radius: 4px;
+    border: 1px solid var(--paper-3);
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 0.95rem;
+    transition: border-color .2s, background .2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--ink-3); background: var(--paper-2); }
+
+  /* ── HERO VISUAL: fake paper card ── */
+  .hero-visual {
+    position: relative;
+  }
+  .paper-card {
+    background: #fff;
+    border: 1px solid var(--paper-3);
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .paper-card::before {
+    content: 'BEFORE';
+    position: absolute;
+    top: -10px; left: 16px;
+    background: var(--paper);
+    border: 1px solid var(--paper-3);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    color: var(--ink-3);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .paper-card .abstract-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .paper-card .jargon {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .paper-card .jargon mark {
+    background: #fde8e7;
+    color: var(--red);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  .arrow-between {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 1.5rem;
+    color: var(--teal);
+  }
+  .easy-card {
+    background: var(--teal-light);
+    border: 1px solid #b8ddd6;
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative;
+  }
+  .easy-card::before {
+    content: 'AFTER';
+    position: absolute;
+    top: -10px; left: 16px;
+    background: var(--teal-light);
+    border: 1px solid #b8ddd6;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    color: var(--teal);
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .easy-card .easy-text {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--ink);
+    line-height: 1.65;
+  }
+
+  /* ── SOCIAL PROOF STRIP ── */
+  .proof-strip {
+    border-top: 1px solid var(--paper-3);
+    border-bottom: 1px solid var(--paper-3);
+    background: var(--paper-2);
+    padding: 1rem var(--gap);
+  }
+  .proof-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+  .proof-item { display: flex; align-items: center; gap: 6px; }
+  .proof-item strong { color: var(--ink); font-weight: 500; }
+
+  /* ── HOW IT WORKS ── */
+  .section {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: clamp(3rem, 6vw, 5rem) var(--gap);
+  }
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--teal);
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 3rem;
+    max-width: 520px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  @media (max-width: 650px) { .steps { grid-template-columns: 1fr; gap: 1.5rem; } }
+  .step { position: relative; padding-left: 1.5rem; border-left: 2px solid var(--paper-3); }
+  .step-num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    color: var(--paper-3);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .step h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+  .step p { font-size: 0.9rem; color: var(--ink-2); line-height: 1.6; }
+
+  /* ── SAMPLES ── */
+  .samples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  .sample-card {
+    background: #fff;
+    border: 1px solid var(--paper-3);
+    border-radius: 6px;
+    padding: 1.5rem;
+    transition: box-shadow .2s, transform .2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .sample-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .sample-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-bottom: 0.75rem;
+  }
+  .tag-medical { background: #fde8e7; color: var(--red); }
+  .tag-political { background: #e8edf5; color: #2c4a7c; }
+  .sample-card h3 {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.35;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+  .sample-card p { font-size: 0.88rem; color: var(--ink-2); line-height: 1.6; margin-bottom: 1rem; }
+  .sample-meta {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .sample-meta::before { content: '→'; color: var(--teal); }
+
+  /* ── SUBMIT SECTION ── */
+  .submit-section {
+    background: var(--ink);
+    color: var(--paper);
+    padding: clamp(3rem, 6vw, 5rem) var(--gap);
+  }
+  .submit-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .submit-section .section-label { color: var(--teal-mid); }
+  .submit-section .section-title { color: var(--paper); margin: 0 auto 1rem; }
+  .submit-sub { color: var(--ink-3); font-size: 0.95rem; margin-bottom: 2rem; }
+  .form-embed {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: left;
+  }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.8rem; color: #a0a098; margin-bottom: 6px; font-weight: 500; letter-spacing: 0.04em; }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--paper);
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    transition: border-color .2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: var(--teal-mid); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-group select option { background: var(--ink); }
+  .form-note { font-size: 0.78rem; color: #6a6a62; margin-top: 6px; }
+  .submit-btn {
+    width: 100%;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    padding: 13px 24px;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background .2s;
+    margin-top: 0.5rem;
+  }
+  .submit-btn:hover { background: var(--teal-mid); }
+  .turnaround { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 1rem; font-size: 0.8rem; color: #6a6a62; }
+  .turnaround-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-mid); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--paper-3);
+    padding: 2rem var(--gap);
+    background: var(--paper-2);
+  }
+  .footer-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.82rem;
+    color: var(--ink-3);
+  }
+  .footer-disclaimer {
+    max-width: 480px;
+    font-size: 0.78rem;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .footer-links { display: flex; gap: 1.25rem; }
+  .footer-links a { color: var(--ink-3); text-decoration: none; }
+  .footer-links a:hover { color: var(--teal); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-text { animation: fadeUp .6s ease both; }
+  .hero-visual { animation: fadeUp .6s ease .15s both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <span class="logo-dot"></span>EasyRead
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#samples">Examples</a>
+      <a href="#submit" class="nav-cta">Try it free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-text">
+    <div class="eyebrow">Free · No signup required</div>
+    <h1>Research papers, finally in <em>plain English</em></h1>
+    <p class="hero-sub">
+      Paste any medical or political science paper. Get a clear, jargon-free explanation — with real-world analogies — that anyone can understand.
+    </p>
+    <div class="hero-actions">
+      <a href="#submit" class="btn-primary">Submit a paper →</a>
+      <a href="#samples" class="btn-secondary">See examples</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="paper-card">
+      <div class="abstract-label">Abstract</div>
+      <p class="jargon">
+        <mark>Dyslipidaemia-induced endothelial dysfunction</mark> mediated by <mark>oxidative stress</mark> and <mark>NF-κB pathway activation</mark> is a primary driver of <mark>atherogenesis</mark> in metabolically compromised patients presenting with <mark>comorbid insulin resistance</mark>…
+      </p>
+    </div>
+    <div class="arrow-between">↓</div>
+    <div class="easy-card">
+      <p class="easy-text">
+        When there's too much fat in your blood, it damages the walls of your blood vessels — a bit like rust forming inside a pipe. This damage is what starts heart disease, especially in people who also have diabetes.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- PROOF STRIP -->
+<div class="proof-strip">
+  <div class="proof-inner">
+    <div class="proof-item">✓ <strong>Open-access papers only</strong> — legally sourced</div>
+    <div class="proof-item">✓ <strong>Sources always cited</strong> — read the original</div>
+    <div class="proof-item">✓ <strong>Not medical advice</strong> — always consult a doctor</div>
+    <div class="proof-item">✓ <strong>Free during beta</strong></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how-it-works">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Three steps from dense paper to clear insight</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Paste the abstract or URL</h3>
+      <p>Works with any paper from PubMed, arXiv, bioRxiv, medRxiv, or SSRN. Just paste the text or the link.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>We simplify it for you</h3>
+      <p>Our AI rewrites it at a high-school reading level — with analogies, key takeaways, and a plain-language glossary.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>Get the explanation by email</h3>
+      <p>We'll send your simplified version within 24 hours. Always with a link back to the original paper.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SAMPLES -->
+<div class="section" id="samples" style="padding-top: 0;">
+  <div class="section-label">Sample explanations</div>
+  <h2 class="section-title">What EasyRead looks like in practice</h2>
+  <div class="samples-grid">
+    <a href="samples/heart-disease.html" class="sample-card">
+      <span class="sample-tag tag-medical">Medical</span>
+      <h3>Why fatty diets cause heart disease — and what your blood vessels actually look like when it happens</h3>
+      <p>A 2024 Nature Cardiology study on dyslipidemia and atherosclerosis, explained without a single Latin term.</p>
+      <div class="sample-meta">5 min read · arXiv source</div>
+    </a>
+    <a href="samples/cancer-screening.html" class="sample-card">
+      <span class="sample-tag tag-medical">Medical</span>
+      <h3>Should you get screened for cancer before symptoms appear? What a landmark study actually found</h3>
+      <p>The real conclusions of a major NEJM screening trial — what it means for ordinary people, not just oncologists.</p>
+      <div class="sample-meta">6 min read · PubMed Open Access</div>
+    </a>
+    <a href="samples/misinformation.html" class="sample-card">
+      <span class="sample-tag tag-political">Political Science</span>
+      <h3>Why people believe false political news — and which interventions actually work</h3>
+      <p>A Harvard Kennedy School study on misinformation spread, explained without the academic framework jargon.</p>
+      <div class="sample-meta">7 min read · SSRN source</div>
+    </a>
+  </div>
+</div>
+
+<!-- SUBMIT -->
+<div class="submit-section" id="submit">
+  <div class="submit-inner">
+    <div class="section-label">Submit your paper</div>
+    <h2 class="section-title">Got a paper you can't decode?</h2>
+    <p class="submit-sub">Paste the abstract below and your email. We'll send you a plain-language version within 24 hours — free during beta.</p>
+
+    <div class="form-embed">
+      <!--
+        INSTRUCTIONS FOR YOU:
+        Replace this form with your Tally.so embed code.
+        Go to tally.so → Create form → Add these fields:
+          1. Email address
+          2. Paper abstract (long text)
+          3. Topic dropdown: Medical / Political Science / Other
+        Then click "Share" → "Embed" and paste the iframe here.
+
+        For now, this placeholder form shows the design.
+        It does NOT submit anywhere — replace with Tally embed.
+      -->
+      <div class="form-group">
+        <label>YOUR EMAIL</label>
+        <input type="email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>PAPER ABSTRACT OR URL</label>
+        <textarea placeholder="Paste the abstract text here, or a link to the paper (PubMed, arXiv, SSRN, etc.)…"></textarea>
+        <div class="form-note">Only open-access papers please. We cannot process paywalled content.</div>
+      </div>
+      <div class="form-group">
+        <label>TOPIC</label>
+        <select>
+          <option>Medical / Health</option>
+          <option>Political Science</option>
+          <option>Other (we'll try)</option>
+        </select>
+      </div>
+      <button class="submit-btn" onclick="alert('⚠️ Replace this form with your Tally.so embed. See the comment in the HTML.')">
+        Send my paper →
+      </button>
+    </div>
+
+    <div class="turnaround">
+      <div class="turnaround-dot"></div>
+      Typical response time: under 24 hours during beta
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-disclaimer">
+      EasyRead simplifies open-access academic papers for educational purposes only. Nothing here is medical or legal advice. Always consult a qualified professional before making health or policy decisions. Sources are always cited.
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/aakmedjonov-bot/EasyRead">GitHub</a>
+      <a href="#submit">Submit a paper</a>
+      <a href="#samples">Examples</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
